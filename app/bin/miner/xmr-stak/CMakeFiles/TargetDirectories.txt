@@ -1,0 +1,9 @@
+/Users/cknepp/Documents/Projects/xmr-stak/CMakeFiles/install/strip.dir
+/Users/cknepp/Documents/Projects/xmr-stak/CMakeFiles/install.dir
+/Users/cknepp/Documents/Projects/xmr-stak/CMakeFiles/install/local.dir
+/Users/cknepp/Documents/Projects/xmr-stak/CMakeFiles/xmr-stak.dir
+/Users/cknepp/Documents/Projects/xmr-stak/CMakeFiles/rebuild_cache.dir
+/Users/cknepp/Documents/Projects/xmr-stak/CMakeFiles/edit_cache.dir
+/Users/cknepp/Documents/Projects/xmr-stak/CMakeFiles/xmr-stak-backend.dir
+/Users/cknepp/Documents/Projects/xmr-stak/CMakeFiles/list_install_components.dir
+/Users/cknepp/Documents/Projects/xmr-stak/CMakeFiles/xmr-stak-c.dir

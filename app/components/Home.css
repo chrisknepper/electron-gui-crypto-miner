@@ -1,0 +1,40 @@
+.container h1 {
+  font-size: 3rem;
+  margin-top: 0;
+}
+
+.container h2 {
+  font-size: 2rem;
+}
+
+.container a {
+  font-size: 1.4rem;
+}
+
+.container button {
+  background: #33d433;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 3px;
+  font-size: 1.5rem;
+}
+
+.container .button2 {
+  background: #d6201a;
+  color: #ddd;
+}
+
+.header {
+  height: 200px;
+  background: #ff6600;
+  padding: 40px 0 0;
+  text-align: center;
+}
+
+.body {
+  background: #4c4c4c;
+  height: 100vh;
+  text-align: center;
+  padding-top: 40px;
+}
