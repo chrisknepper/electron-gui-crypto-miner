@@ -7,6 +7,7 @@ const child_process = require('child_process');
 const electron = require('electron');
 const path = require('path');
 const currentWindow = electron.remote.getCurrentWindow();
+const LOCAL_APP_VERSION = currentWindow.appInfo.version;
 
 const { shell } = require('electron');
 
@@ -19,22 +20,86 @@ export default class Home extends Component {
     super(props);
 
     this.openRedditLink = this.openRedditLink.bind(this);
+    this.openUpdateLink = this.openUpdateLink.bind(this);
     this.end = this.end.bind(this);
     this.mine = this.mine.bind(this);
     this.getMiningExecutable = this.getMiningExecutable.bind(this);
     this.getMiningConfig = this.getMiningConfig.bind(this);
     this.getMiningStatusText = this.getMiningStatusText.bind(this);
 
+    this.getLatestVersionOfApp = this.getLatestVersionOfApp.bind(this);
+
+    this.renderAppVersion = this.renderAppVersion.bind(this);
+
     this.state = {
       miningProcess: null,
-      walletAddress: ''
+      walletAddress: '',
+      appOutOfDate: false
     }
+  }
+
+  async componentDidMount() {
+
+    const latestLocalVersion = LOCAL_APP_VERSION;
+    const latestRemoteVersion = await this.getLatestVersionOfApp();
+
+    if (latestLocalVersion && latestRemoteVersion) {
+      const outOfDate = this.determineVersionOutOfDate(latestLocalVersion, latestRemoteVersion);
+
+      if (outOfDate) {
+        console.warn('not on latest version!');
+        this.setState({appOutOfDate: true});
+      }
+    }
+    
+  }
+
+  async getLatestVersionOfApp() {
+    const url = 'https://api.github.com/graphql';
+    const latestReleaseQuery = { query: "{ repository(owner: \"chrisknepper\", name: \"electron-gui-crypto-miner\") {\n    releases(last: 1) {\n      edges {\n        node {\n          tag {\n            name\n          }\n          name\n          description\n          publishedAt\n        }\n      }\n    }\n  }\n}\n", variables: "{}", operationName: null };
+
+    try {
+      const rawLatestVersion = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(latestReleaseQuery),
+        headers: new Headers({
+          'Content-Type': 'application/json',
+          'Authorization': 'bearer 2b61b5869c41617422c9985615713e8d5aef1df5'
+        })
+      });
+
+      const jsonLatestVersion = await rawLatestVersion.json();
+
+      if (jsonLatestVersion && 'data' in jsonLatestVersion && 'repository' in jsonLatestVersion.data) {
+        const latestVersion = jsonLatestVersion.data.repository.releases.edges[0].node.tag.name;
+        console.log('latest version', latestVersion);
+        return latestVersion;
+      }
+
+
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  determineVersionOutOfDate(localVersion, remoteVersion) {
+    const localVersionNum = this.determineVersionStringToNumber(localVersion);
+    const remoteVersionNum = this.determineVersionStringToNumber(remoteVersion);
+    return remoteVersionNum > localVersionNum;
+  }
+
+  determineVersionStringToNumber(versionStr) {
+    return Number(versionStr.replace('v', '').replace(/\./g, ''));
   }
 
   openRedditLink() {
     shell.openExternal('https://www.reddit.com/r/Monero/comments/7hhgjx/monero_gui_01110_helium_hydra_megathread_download/');
   }
 
+  openUpdateLink() {
+    shell.openExternal('https://github.com/chrisknepper/electron-gui-crypto-miner');
+  }
 
   mine() {
     console.log('mounted!', process.platform);
@@ -127,6 +192,18 @@ export default class Home extends Component {
     }
   }
 
+  renderAppVersion() {
+    return (
+      <h4 className={styles.version}><a href="#" onClick={this.openUpdateLink}>v{LOCAL_APP_VERSION}</a></h4>
+    );
+  }
+
+  renderOutOfDateNotification() {
+    if (this.state.appOutOfDate) {
+      return <h5 className={styles.versionOutOfDate}><a href="#" onClick={this.openUpdateLink}>You are running an old version! Click here to update.</a></h5>
+    }
+  }
+
   render() {
     return (
       <div>
@@ -141,6 +218,10 @@ export default class Home extends Component {
             { this.maybeRenderStartMiningButton() }
             { this.maybeRenderStopMiningButton() }
             { /*<button className={styles.button} ><Link to="/counter">Start Mining</Link></button> */ }
+            <div>
+              { this.renderAppVersion() }
+              { this.renderOutOfDateNotification() }
+            </div>
           </div>
         </div>
       </div>

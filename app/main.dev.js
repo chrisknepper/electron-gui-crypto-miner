@@ -13,6 +13,8 @@
 import { app, BrowserWindow } from 'electron';
 import MenuBuilder from './menu';
 
+import { version } from './package.json';
+
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -66,7 +68,8 @@ app.on('ready', async () => {
   });
 
   mainWindow.appInfo = {
-    path: app.getAppPath()
+    path: app.getAppPath(),
+    version
   };
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);

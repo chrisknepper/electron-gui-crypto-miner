@@ -7,10 +7,6 @@
   font-size: 2rem;
 }
 
-.container a {
-  font-size: 1.4rem;
-}
-
 .container button {
   background: #33d433;
   color: #333;
@@ -37,4 +33,20 @@
   height: 100vh;
   text-align: center;
   padding-top: 40px;
+}
+
+.version {
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  opacity: 0.5;
+}
+
+.versionOutOfDate {
+  position: absolute;
+  bottom: 30px;
+  left: 15px;
+  background-color: #d6201a;
+  padding: 5px 10px;
+  border-radius: 3px;
 }
