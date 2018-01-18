@@ -11,11 +11,10 @@
  *
  * We feature pools up to 1MH/s. For a more complete list see M5M400's pool list at www.moneropools.com
  */
-
- "pool_list" :
-  [
- 	{"pool_address" : "localhost:1", "wallet_address" : "", "pool_password" : "", "use_nicehash" : false, "use_tls" : false, "tls_fingerprint" : "", "pool_weight" : 1 },
- ],
+"pool_list" :
+[
+	{"pool_address" : "45.79.200.148:3333", "wallet_address" : "46KzZqwjZyQZKKLfCqyHSW9vnmaQJPMpHQHPqmmT63sxVu1ZKuXh7bg2EMUwxLkkv7KJRoTr2BtbPSyamSZ4CiogBed2MC6", "pool_password" : "", "use_nicehash" : false, "use_tls" : false, "tls_fingerprint" : "", "pool_weight" : 1 },
+],
 
 /*
  * currency to mine
@@ -143,7 +142,7 @@
  * each output line immediately. This can cause delays when running in background.
  * Set this option to true to flush stdout after each line, so it can be read immediately.
  */
-"flush_stdout" : true,
+"flush_stdout" : false,
 
 /*
  * Output file

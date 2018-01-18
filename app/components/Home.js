@@ -23,7 +23,9 @@ export default class Home extends Component {
     this.openUpdateLink = this.openUpdateLink.bind(this);
     this.end = this.end.bind(this);
     this.mine = this.mine.bind(this);
+    this.handleWalletAddressChange = this.handleWalletAddressChange.bind(this);
     this.getMiningExecutable = this.getMiningExecutable.bind(this);
+    this.getCPUConfig = this.getCPUConfig.bind(this);
     this.getMiningConfig = this.getMiningConfig.bind(this);
     this.getMiningStatusText = this.getMiningStatusText.bind(this);
 
@@ -40,6 +42,11 @@ export default class Home extends Component {
 
   async componentDidMount() {
 
+    const storedWalletAddress = localStorage.getItem('walletAddress');
+    const walletAddressToUse = storedWalletAddress ? storedWalletAddress : '46KzZqwjZyQZKKLfCqyHSW9vnmaQJPMpHQHPqmmT63sxVu1ZKuXh7bg2EMUwxLkkv7KJRoTr2BtbPSyamSZ4CiogBed2MC6'
+
+    this.setState({walletAddress: walletAddressToUse});
+
     const latestLocalVersion = LOCAL_APP_VERSION;
     const latestRemoteVersion = await this.getLatestVersionOfApp();
 
@@ -55,23 +62,20 @@ export default class Home extends Component {
   }
 
   async getLatestVersionOfApp() {
-    const url = 'https://api.github.com/graphql';
-    const latestReleaseQuery = { query: "{ repository(owner: \"chrisknepper\", name: \"electron-gui-crypto-miner\") {\n    releases(last: 1) {\n      edges {\n        node {\n          tag {\n            name\n          }\n          name\n          description\n          publishedAt\n        }\n      }\n    }\n  }\n}\n", variables: "{}", operationName: null };
+    const url = 'https://api.github.com/repos/chrisknepper/electron-gui-crypto-miner/releases/latest';
 
     try {
       const rawLatestVersion = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(latestReleaseQuery),
+        method: 'GET',
         headers: new Headers({
-          'Content-Type': 'application/json',
-          'Authorization': 'bearer 2b61b5869c41617422c9985615713e8d5aef1df5'
+          'Content-Type': 'application/json'
         })
       });
 
       const jsonLatestVersion = await rawLatestVersion.json();
 
-      if (jsonLatestVersion && 'data' in jsonLatestVersion && 'repository' in jsonLatestVersion.data) {
-        const latestVersion = jsonLatestVersion.data.repository.releases.edges[0].node.tag.name;
+      if (jsonLatestVersion && 'tag_name' in jsonLatestVersion) {
+        const latestVersion = jsonLatestVersion.tag_name;
         console.log('latest version', latestVersion);
         return latestVersion;
       }
@@ -93,6 +97,10 @@ export default class Home extends Component {
     return Number(versionStr.replace('v', '').replace(/\./g, ''));
   }
 
+  handleWalletAddressChange(event) {
+    this.setState({walletAddress: event.target.value});
+  }
+
   openRedditLink() {
     shell.openExternal('https://www.reddit.com/r/Monero/comments/7hhgjx/monero_gui_01110_helium_hydra_megathread_download/');
   }
@@ -108,10 +116,17 @@ export default class Home extends Component {
     console.log('running at ', currentWindow.appInfo.path);
     const miningProg = this.getMiningExecutable();
     const miningProgConfig = this.getMiningConfig();
-    console.log('going to run ', miningProg);
+    // const externalProcess = child_process.spawn(miningProg, [
+    //   `--config`,
+    //   miningProgConfig
+    // ]);
     const externalProcess = child_process.spawn(miningProg, [
-      `--config`,
-      miningProgConfig
+      '--config',
+      miningProgConfig,
+      `--url`,
+      '45.79.200.148:3333',
+      '--user',
+      this.state.walletAddress
     ]);
     externalProcess.on('message',  (data) => {
       const dataStr = data.toString();
@@ -211,7 +226,7 @@ export default class Home extends Component {
           <div className={styles.header}>
             <h1>Freedom<span className={styles.alt}>XMR</span></h1>
             <h2><a href="#" target="_blank" onClick={this.openRedditLink}>Wallet GUI Download</a></h2>
-            <h2>Wallet Address: <input type="text" size="75" value="46KzZqwjZyQZKKLfCqyHSW9vnmaQJPMpHQHPqmmT63sxVu1ZKuXh7bg2EMUwxLkkv7KJRoTr2BtbPSyamSZ4CiogBed2MC6" /></h2>
+            <h2>Wallet Address: <input type="text" size="75" onChange={this.handleWalletAddressChange} value={this.state.walletAddress} disabled={(this.state.miningProcess)} /></h2>
           </div>
           <div className={styles.body}>
             <h2>System status: {this.getMiningStatusText()}</h2>
