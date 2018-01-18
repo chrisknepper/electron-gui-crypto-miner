@@ -25,7 +25,6 @@ export default class Home extends Component {
     this.mine = this.mine.bind(this);
     this.handleWalletAddressChange = this.handleWalletAddressChange.bind(this);
     this.getMiningExecutable = this.getMiningExecutable.bind(this);
-    this.getCPUConfig = this.getCPUConfig.bind(this);
     this.getMiningConfig = this.getMiningConfig.bind(this);
     this.getMiningStatusText = this.getMiningStatusText.bind(this);
 
