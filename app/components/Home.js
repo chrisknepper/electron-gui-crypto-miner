@@ -42,9 +42,9 @@ export default class Home extends Component {
   async componentDidMount() {
 
     const storedWalletAddress = localStorage.getItem('walletAddress');
-    const walletAddressToUse = storedWalletAddress ? storedWalletAddress : '46KzZqwjZyQZKKLfCqyHSW9vnmaQJPMpHQHPqmmT63sxVu1ZKuXh7bg2EMUwxLkkv7KJRoTr2BtbPSyamSZ4CiogBed2MC6'
-
-    this.setState({walletAddress: walletAddressToUse});
+    if (storedWalletAddress) {
+      this.setState({ walletAddress: storedWalletAddress });
+    }
 
     const latestLocalVersion = LOCAL_APP_VERSION;
     const latestRemoteVersion = await this.getLatestVersionOfApp();
@@ -58,6 +58,10 @@ export default class Home extends Component {
       }
     }
     
+  }
+
+  componentWillUnmount() {
+    this.end();
   }
 
   async getLatestVersionOfApp() {
@@ -97,7 +101,10 @@ export default class Home extends Component {
   }
 
   handleWalletAddressChange(event) {
-    this.setState({walletAddress: event.target.value});
+    const newValue = event.target.value;
+    this.setState({walletAddress: newValue}, () => {
+      localStorage.setItem('walletAddress', newValue);
+    });
   }
 
   openRedditLink() {
@@ -162,6 +169,8 @@ export default class Home extends Component {
     let prog = null;
     if (IS_MAC) {
       prog = path.resolve(rootBinDir, 'miner', 'xmr-stak', 'bin', 'xmr-stak');
+    } else if (IS_WINDOWS) {
+      prog = path.resolve(rootBinDir, 'miner', 'xmr-stak', 'bin', 'xmr-stak.exe');
     } else {
       console.warn('Mining not yet implemented for this platform');
     }
@@ -174,6 +183,8 @@ export default class Home extends Component {
 
     let prog = null;
     if (IS_MAC) {
+      prog = path.resolve(rootBinDir, 'miner', 'xmr-stak', 'bin', 'config.txt');
+    } else if (IS_WINDOWS) {
       prog = path.resolve(rootBinDir, 'miner', 'xmr-stak', 'bin', 'config.txt');
     } else {
       console.warn('Mining config not yet implemented for this platform');
@@ -193,7 +204,7 @@ export default class Home extends Component {
   maybeRenderStartMiningButton() {
     if (!this.state.miningProcess) {
       return (
-        <button className={styles.button} onClick={this.mine}>Start Mining</button>
+        <button className={styles.button} disabled={(!this.state.walletAddress.length)} onClick={this.mine}>Start Mining</button>
       );
     }
   }
@@ -224,7 +235,7 @@ export default class Home extends Component {
         <div className={styles.container} data-tid="container">
           <div className={styles.header}>
             <h1>Freedom <span className={styles.alt}>XMR</span></h1>
-            <h2>Wallet Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handleWalletAddressChange} value={this.state.walletAddress} disabled={(this.state.miningProcess)} /></h2>
+            <h2>Wallet Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handleWalletAddressChange} value={this.state.walletAddress} placeholder={'Enter your wallet address here'} disabled={(this.state.miningProcess)} /></h2>
             <h3><a href="#" target="_blank" onClick={this.openRedditLink}>Wallet Download Guide</a></h3>
           </div>
           <div className={styles.body}>
