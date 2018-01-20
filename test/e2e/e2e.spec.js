@@ -35,7 +35,7 @@ describe('main window', function spec() {
     await client.waitUntilWindowLoaded();
     await delay(500);
     const title = await browserWindow.getTitle();
-    expect(title).toBe('FreedomXMR Miner');
+    expect(title).toBe('Freedom XMR Miner');
   });
 
   it('should haven\'t any logs in console of main window', async () => {

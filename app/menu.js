@@ -45,13 +45,13 @@ export default class MenuBuilder {
 
   buildDarwinTemplate() {
     const subMenuAbout = {
-      label: 'FreedomXMR Miner',
+      label: 'Freedom XMR Miner',
       submenu: [
-        { label: 'About FreedomXMR Miner', selector: 'orderFrontStandardAboutPanel:' },
+        { label: 'About Freedom XMR Miner', selector: 'orderFrontStandardAboutPanel:' },
         { type: 'separator' },
         { label: 'Services', submenu: [] },
         { type: 'separator' },
-        { label: 'Hide FreedomXMR Miner', accelerator: 'Command+H', selector: 'hide:' },
+        { label: 'Hide Freedom XMR Miner', accelerator: 'Command+H', selector: 'hide:' },
         { label: 'Hide Others', accelerator: 'Command+Shift+H', selector: 'hideOtherApplications:' },
         { label: 'Show All', selector: 'unhideAllApplications:' },
         { type: 'separator' },

@@ -223,9 +223,9 @@ export default class Home extends Component {
       <div>
         <div className={styles.container} data-tid="container">
           <div className={styles.header}>
-            <h1>Freedom<span className={styles.alt}>XMR</span></h1>
-            <h2><a href="#" target="_blank" onClick={this.openRedditLink}>Wallet GUI Download</a></h2>
-            <h2>Wallet Address: <input type="text" size="75" onChange={this.handleWalletAddressChange} value={this.state.walletAddress} disabled={(this.state.miningProcess)} /></h2>
+            <h1>Freedom <span className={styles.alt}>XMR</span></h1>
+            <h2>Wallet Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handleWalletAddressChange} value={this.state.walletAddress} disabled={(this.state.miningProcess)} /></h2>
+            <h3><a href="#" target="_blank" onClick={this.openRedditLink}>Wallet Download Guide</a></h3>
           </div>
           <div className={styles.body}>
             <h2>System status: {this.getMiningStatusText()}</h2>

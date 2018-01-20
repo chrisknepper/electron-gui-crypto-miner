@@ -50,3 +50,7 @@
   padding: 5px 10px;
   border-radius: 3px;
 }
+
+.walletAddressInput {
+  font-size: 1.2rem;
+}
