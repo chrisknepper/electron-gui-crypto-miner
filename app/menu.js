@@ -96,7 +96,8 @@ export default class MenuBuilder {
     const subMenuHelp = {
       label: 'Help',
       submenu: [
-        { label: 'Learn More', click() { shell.openExternal('https://api.github.com/repos/chrisknepper/electron-gui-crypto-miner'); } }
+        { label: 'Learn More', click() { shell.openExternal('https://api.github.com/repos/chrisknepper/electron-gui-crypto-miner'); } },
+        { label: 'Open Dev Tools (plz no bully)', click: () => { this.mainWindow.toggleDevTools(); } }
       ]
     };
 

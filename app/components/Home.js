@@ -14,6 +14,10 @@ const { shell } = require('electron');
 const IS_MAC = (process.platform === 'darwin');
 const IS_WINDOWS = (process.platform === 'win32');
 
+console.log('hey dawg, the resources path is', currentWindow.appInfo.resourcesPath);
+console.log('hey dawg, the environment is production?', currentWindow.appInfo.isProduction);
+console.log('hey dawg, the bin directory is', currentWindow.appInfo.rootBinDir);
+
 export default class Home extends Component {
   
   constructor(props) {
@@ -165,7 +169,7 @@ export default class Home extends Component {
   }
   
   getMiningExecutable() {
-    const rootBinDir = path.resolve(__dirname, 'bin');
+    const { rootBinDir } = currentWindow.appInfo;
 
     let prog = null;
     if (IS_MAC) {
@@ -176,12 +180,12 @@ export default class Home extends Component {
     } else {
       console.warn('Mining not yet implemented for this platform');
     }
-
+    console.log('the exe to run is at', prog);
     return prog;
   }
 
   getMiningConfig() {
-    const rootBinDir = path.resolve(__dirname, 'bin');
+    const { rootBinDir } = currentWindow.appInfo;
 
     let prog = null;
     if (IS_MAC) {

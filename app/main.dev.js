@@ -15,6 +15,8 @@ import MenuBuilder from './menu';
 
 import { version } from './package.json';
 
+const path = require('path');
+
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -24,7 +26,6 @@ if (process.env.NODE_ENV === 'production') {
 
 if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
   require('electron-debug')();
-  const path = require('path');
   const p = path.join(__dirname, '..', 'app', 'node_modules');
   require('module').globalPaths.push(p);
 }
@@ -67,8 +68,15 @@ app.on('ready', async () => {
     height: 728
   });
 
+  const isProduction = (process.env.NODE_ENV === 'production');
+  const resourcesPath = process.resourcesPath;
+  const rootBinDir = (isProduction ? path.resolve(process.resourcesPath, 'app', 'bin') : path.resolve(__dirname, 'bin'));
+
   mainWindow.appInfo = {
     path: app.getAppPath(),
+    isProduction,
+    resourcesPath,
+    rootBinDir,
     version
   };
 

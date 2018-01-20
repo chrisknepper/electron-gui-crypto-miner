@@ -41,6 +41,9 @@
       "main.prod.js.map",
       "package.json"
     ],
+    "extraResources": [
+      "app/bin/**"
+    ],
     "dmg": {
       "contents": [
         {
