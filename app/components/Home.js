@@ -159,6 +159,7 @@ export default class Home extends Component {
   end() {
     if (this.state.miningProcess) {
       console.warn('trying to kill mining process');
+      
       this.state.miningProcess.kill('SIGTERM');
     }
   }
@@ -170,6 +171,7 @@ export default class Home extends Component {
     if (IS_MAC) {
       prog = path.resolve(rootBinDir, 'miner', 'xmr-stak', 'bin', 'xmr-stak');
     } else if (IS_WINDOWS) {
+      console.warn('windows!');
       prog = path.resolve(rootBinDir, 'miner', 'xmr-stak', 'bin', 'xmr-stak.exe');
     } else {
       console.warn('Mining not yet implemented for this platform');
