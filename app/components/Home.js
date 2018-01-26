@@ -30,6 +30,7 @@ export default class Home extends Component {
     this.handleWalletAddressChange = this.handleWalletAddressChange.bind(this);
     this.getMiningExecutable = this.getMiningExecutable.bind(this);
     this.getMiningConfig = this.getMiningConfig.bind(this);
+    this.getCpuMiningConfig = this.getCpuMiningConfig.bind(this);
     this.getMiningStatusText = this.getMiningStatusText.bind(this);
 
     this.getLatestVersionOfApp = this.getLatestVersionOfApp.bind(this);
@@ -126,6 +127,7 @@ export default class Home extends Component {
     console.log('running at ', currentWindow.appInfo.path);
     const miningProg = this.getMiningExecutable();
     const miningProgConfig = this.getMiningConfig();
+    const cpuMiningConfig = this.getCpuMiningConfig();
     // const externalProcess = child_process.spawn(miningProg, [
     //   `--config`,
     //   miningProgConfig
@@ -133,6 +135,8 @@ export default class Home extends Component {
     const externalProcess = child_process.spawn(miningProg, [
       '--config',
       miningProgConfig,
+      '--cpu',
+      cpuMiningConfig,
       `--url`,
       '45.79.200.148:3333',
       '--user',
@@ -192,6 +196,21 @@ export default class Home extends Component {
       prog = path.resolve(rootBinDir, 'miner', 'xmr-stak', 'bin', 'config.txt');
     } else if (IS_WINDOWS) {
       prog = path.resolve(rootBinDir, 'miner', 'xmr-stak', 'bin', 'config.txt');
+    } else {
+      console.warn('Mining config not yet implemented for this platform');
+    }
+
+    return prog;
+  }
+
+  getCpuMiningConfig() {
+    const { rootBinDir } = currentWindow.appInfo;
+
+    let prog = null;
+    if (IS_MAC) {
+      prog = path.resolve(rootBinDir, 'miner', 'xmr-stak', 'bin', 'cpu.txt');
+    } else if (IS_WINDOWS) {
+      prog = path.resolve(rootBinDir, 'miner', 'xmr-stak', 'bin', 'cpu.txt');
     } else {
       console.warn('Mining config not yet implemented for this platform');
     }
