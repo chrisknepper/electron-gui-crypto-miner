@@ -13,7 +13,7 @@
 import { app, BrowserWindow } from 'electron';
 import MenuBuilder from './menu';
 
-import { version } from './package.json';
+import { version } from '../package.json';
 
 const path = require('path');
 
