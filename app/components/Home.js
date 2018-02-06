@@ -27,6 +27,7 @@ export default class Home extends Component {
     this.openUpdateLink = this.openUpdateLink.bind(this);
     this.end = this.end.bind(this);
     this.mine = this.mine.bind(this);
+    this.appendLog = this.appendLog.bind(this);
     this.handleWalletAddressChange = this.handleWalletAddressChange.bind(this);
     this.getMiningExecutable = this.getMiningExecutable.bind(this);
     this.getMiningConfig = this.getMiningConfig.bind(this);
@@ -40,7 +41,9 @@ export default class Home extends Component {
     this.state = {
       miningProcess: null,
       walletAddress: '',
-      appOutOfDate: false
+      appOutOfDate: false,
+      showLog: false,
+      logArray: []
     }
   }
 
@@ -149,6 +152,7 @@ export default class Home extends Component {
     externalProcess.stdout.on('data',  (data) => {
       const dataStr = data.toString();
       console.log('data from external program ', dataStr);
+      this.appendLog(dataStr);
     });
     externalProcess.stderr.on('data',  (data) => {
       const dataStr = data.toString();
@@ -169,6 +173,17 @@ export default class Home extends Component {
       console.warn('trying to kill mining process');
       
       this.state.miningProcess.kill('SIGTERM');
+    }
+  }
+
+  appendLog(line) {
+    if (this.state.showLog) {
+      const newLogArray = [...this.state.logArray];
+      if (this.state.logArray.length > 10) {
+        newLogArray.shift();
+      }
+      newLogArray.push(line);
+      this.setState({ logArray: newLogArray });
     }
   }
   
@@ -254,6 +269,34 @@ export default class Home extends Component {
     }
   }
 
+  renderConsoleLogCheckbox() {
+    return (
+      <div className={styles.showLogCheckbox}>
+        <label>
+          <input
+            name="showLog"
+            type="checkbox"
+            checked={this.state.showLog}
+            onChange={(event) => {console.log('checked?', event.target.checked); this.setState({showLog: event.target.checked})}} /> Display Logs
+        </label>
+      </div>
+    
+    );
+  }
+
+  renderConsoleLog() {
+    if (this.state.showLog) {
+      return (
+        <div className={styles.logContainer}>
+          { this.state.logArray.map((log) => {
+              return <span className={styles.log}>{log}</span>
+            })
+          }
+        </div>
+      );
+    }
+  }
+
   render() {
     return (
       <div>
@@ -268,9 +311,11 @@ export default class Home extends Component {
             { this.maybeRenderStartMiningButton() }
             { this.maybeRenderStopMiningButton() }
             { /*<button className={styles.button} ><Link to="/counter">Start Mining</Link></button> */ }
+            { this.renderConsoleLog() }
             <div>
               { this.renderAppVersion() }
               { this.renderOutOfDateNotification() }
+              { this.renderConsoleLogCheckbox() }
             </div>
           </div>
         </div>

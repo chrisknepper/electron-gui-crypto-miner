@@ -54,3 +54,19 @@
 .walletAddressInput {
   font-size: 1.2rem;
 }
+
+.showLogCheckbox {
+  position: absolute;
+  bottom: 30px;
+  right: 15px;
+}
+
+.logContainer {
+  margin-top: 10px;
+}
+
+.log {
+  display: block;
+  font-size: 0.7rem;
+  font-family: monospace;
+}
