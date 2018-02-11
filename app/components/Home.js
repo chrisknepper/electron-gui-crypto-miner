@@ -23,7 +23,7 @@ export default class Home extends Component {
   constructor(props) {
     super(props);
 
-    this.openRedditLink = this.openRedditLink.bind(this);
+    this.openWalletArticleLink = this.openWalletArticleLink.bind(this);
     this.openUpdateLink = this.openUpdateLink.bind(this);
     this.end = this.end.bind(this);
     this.mine = this.mine.bind(this);
@@ -115,8 +115,8 @@ export default class Home extends Component {
     });
   }
 
-  openRedditLink() {
-    shell.openExternal('https://www.reddit.com/r/Monero/comments/7hhgjx/monero_gui_01110_helium_hydra_megathread_download/');
+  openWalletArticleLink() {
+    shell.openExternal('https://medium.com/@samradavid/the-easiest-monero-wallet-installation-guide-e51e5cecb38d');
   }
 
   openUpdateLink() {
@@ -304,7 +304,7 @@ export default class Home extends Component {
           <div className={styles.header}>
             <h1>Freedom <span className={styles.alt}>XMR</span></h1>
             <h2>Wallet Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handleWalletAddressChange} value={this.state.walletAddress} placeholder={'Enter your wallet address here'} disabled={(this.state.miningProcess)} /></h2>
-            <h3><a href="#" target="_blank" onClick={this.openRedditLink}>Wallet Download Guide</a></h3>
+            <h3><a href="#" onClick={this.openWalletArticleLink}>Wallet Download Guide</a></h3>
           </div>
           <div className={styles.body}>
             <h2>System status: {this.getMiningStatusText()}</h2>
