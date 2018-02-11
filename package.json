@@ -42,7 +42,8 @@
       "package.json"
     ],
     "extraResources": [
-      "app/bin/**"
+      "app/bin/**",
+      "app/assets/**"
     ],
     "dmg": {
       "contents": [
