@@ -8,6 +8,7 @@ const electron = require('electron');
 const path = require('path');
 const currentWindow = electron.remote.getCurrentWindow();
 const LOCAL_APP_VERSION = currentWindow.appInfo.version;
+const ASSET_PATH = currentWindow.appInfo.rootAssetDir;
 
 const { shell } = require('electron');
 
@@ -303,7 +304,7 @@ export default class Home extends Component {
         <div className={styles.container} data-tid="container">
           <div className={styles.header}>
             <div className={styles.brandContainer}>
-              <img src="assets/icon.png" alt="Logo for Freedom XMR" className={styles.logo} />
+              <img src={ASSET_PATH + '/icon.png'} alt="Logo for Freedom XMR" className={styles.logo} />
               <h1 className={styles.headerText}>Freedom <span className={styles.alt}>XMR</span></h1>
             </div>
             <h3 className={styles.helpContainer}>

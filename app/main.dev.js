@@ -71,12 +71,14 @@ app.on('ready', async () => {
   const isProduction = (process.env.NODE_ENV === 'production');
   const resourcesPath = process.resourcesPath;
   const rootBinDir = (isProduction ? path.resolve(process.resourcesPath, 'app', 'bin') : path.resolve(__dirname, 'bin'));
+  const rootAssetDir = (isProduction ? path.resolve(process.resourcesPath, 'app', 'assets') : path.resolve(__dirname, 'assets'));
 
   mainWindow.appInfo = {
     path: app.getAppPath(),
     isProduction,
     resourcesPath,
     rootBinDir,
+    rootAssetDir,
     version
   };
 
