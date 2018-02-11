@@ -302,7 +302,8 @@ export default class Home extends Component {
       <div>
         <div className={styles.container} data-tid="container">
           <div className={styles.header}>
-            <h1>Freedom <span className={styles.alt}>XMR</span></h1>
+            <img src="assets/icon.png" alt="Logo for Freedom XMR" />
+            <h1 className={styles.headerText}>Freedom <span className={styles.alt}>XMR</span></h1>
             <h2>Wallet Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handleWalletAddressChange} value={this.state.walletAddress} placeholder={'Enter your wallet address here'} disabled={(this.state.miningProcess)} /></h2>
             <h3><a href="#" onClick={this.openWalletArticleLink}>Wallet Download Guide</a></h3>
           </div>

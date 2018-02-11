@@ -28,6 +28,10 @@
   text-align: center;
 }
 
+.headerText {
+  display: inline;
+}
+
 .body {
   background: #4c4c4c;
   height: 100vh;
