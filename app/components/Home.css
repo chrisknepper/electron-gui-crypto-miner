@@ -1,5 +1,5 @@
 .container h1 {
-  font-size: 3rem;
+  font-size: 2.5rem;
   margin-top: 0;
 }
 
@@ -22,14 +22,37 @@
 }
 
 .header {
-  height: 200px;
+  height: 50px;
   background: #ff6600;
   padding: 40px 0 0;
   text-align: center;
 }
 
+.brandContainer {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.logo {
+  width: 64px;
+  vertical-align: middle;
+}
+
 .headerText {
+  margin-right: 5px;
   display: inline;
+  vertical-align: middle;
+}
+
+.helpContainer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.help {
+  vertical-align: middle;
 }
 
 .body {

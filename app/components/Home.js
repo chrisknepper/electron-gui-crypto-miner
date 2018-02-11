@@ -244,7 +244,7 @@ export default class Home extends Component {
   maybeRenderStartMiningButton() {
     if (!this.state.miningProcess) {
       return (
-        <button className={styles.button} disabled={(!this.state.walletAddress.length)} onClick={this.mine}>Start Mining</button>
+        <button className={styles.button} disabled={(!this.state.walletAddress.length)} onClick={this.mine}><i className="fa fa-play" /> Start Mining</button>
       );
     }
   }
@@ -252,7 +252,7 @@ export default class Home extends Component {
   maybeRenderStopMiningButton() {
     if (this.state.miningProcess) {
       return (
-        <button className={styles.button2} onClick={this.end}>Stop Mining</button>
+        <button className={styles.button2} onClick={this.end}><i className="fa fa-stop" /> Stop Mining</button>
       );
     }
   }
@@ -302,13 +302,17 @@ export default class Home extends Component {
       <div>
         <div className={styles.container} data-tid="container">
           <div className={styles.header}>
-            <img src="assets/icon.png" alt="Logo for Freedom XMR" />
-            <h1 className={styles.headerText}>Freedom <span className={styles.alt}>XMR</span></h1>
-            <h2>Wallet Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handleWalletAddressChange} value={this.state.walletAddress} placeholder={'Enter your wallet address here'} disabled={(this.state.miningProcess)} /></h2>
-            <h3><a href="#" onClick={this.openWalletArticleLink}>Wallet Download Guide</a></h3>
+            <div className={styles.brandContainer}>
+              <img src="assets/icon.png" alt="Logo for Freedom XMR" className={styles.logo} />
+              <h1 className={styles.headerText}>Freedom <span className={styles.alt}>XMR</span></h1>
+            </div>
+            <h3 className={styles.helpContainer}>
+              <a href="#" className={styles.help} onClick={this.openWalletArticleLink}>Wallet Download Guide</a>
+            </h3>
           </div>
           <div className={styles.body}>
-            <h2>System status: {this.getMiningStatusText()}</h2>
+            <h2>Wallet Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handleWalletAddressChange} value={this.state.walletAddress} placeholder={'Enter your wallet address here'} disabled={(this.state.miningProcess)} /></h2>
+            <h2>System Status: {this.getMiningStatusText()}</h2>
             { this.maybeRenderStartMiningButton() }
             { this.maybeRenderStopMiningButton() }
             { /*<button className={styles.button} ><Link to="/counter">Start Mining</Link></button> */ }
