@@ -3,9 +3,11 @@ import { app, Menu, shell, BrowserWindow } from 'electron';
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
+  licenseWindow: BrowserWindow;
 
   constructor(mainWindow: BrowserWindow) {
     this.mainWindow = mainWindow;
+    this.licenseWindow = null;
   }
 
   buildMenu() {
@@ -97,7 +99,8 @@ export default class MenuBuilder {
       label: 'Help',
       submenu: [
         { label: 'Learn More', click() { shell.openExternal('https://api.github.com/repos/chrisknepper/electron-gui-crypto-miner'); } },
-        { label: 'Open Dev Tools (plz no bully)', click: () => { this.mainWindow.toggleDevTools(); } }
+        { label: 'Open Dev Tools (plz no bully)', click: () => { this.mainWindow.toggleDevTools(); } },
+        { label: 'Open Source Licenses', click: () => { this.openLicenseWindow(); } }
       ]
     };
 
@@ -156,14 +159,37 @@ export default class MenuBuilder {
       }]
     }, {
       label: 'Help',
-      submenu: [{
-        label: 'Learn More',
-        click() {
-          shell.openExternal('https://api.github.com/repos/chrisknepper/electron-gui-crypto-miner');
-        }
-      }]
+      submenu: [
+        { label: 'Learn More', click() { shell.openExternal('https://api.github.com/repos/chrisknepper/electron-gui-crypto-miner'); } },
+        { label: 'Open Dev Tools (plz no bully)', click: () => { this.mainWindow.toggleDevTools(); } },
+        { label: 'Open Source Licenses', click: () => { this.openLicenseWindow(); } }
+      ]
     }];
 
     return templateDefault;
+  }
+
+  openLicenseWindow() {
+    if (this.licenseWindow) {
+      this.licenseWindow.focus();
+      return;
+    }
+
+    this.licenseWindow = new BrowserWindow({
+      height: 450,
+      resizable: false,
+      width: 360,
+      title: 'Open Source Licenses',
+      minimizable: false,
+      maximizable: false,
+      fullscreenable: false,
+      titleBarStyle: 'hiddenInset'
+    });
+
+    this.licenseWindow.loadURL('file://' + __dirname + '/extra/OpenSourceLicenses.html');
+
+    this.licenseWindow.on('closed', () => {
+      this.licenseWindow = null;
+    });
   }
 }

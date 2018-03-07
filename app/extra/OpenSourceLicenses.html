@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Open Source Licenses</title>
+    <style>
+      body {
+        color: WindowText;
+        background-color: Window;
+        font: caption;
+      }
+      #header {
+        text-align: center;
+        margin-top: 40px;
+      }
+      #explain {
+        border-bottom: 1px solid #cccccc;
+      }
+      .software {
+        border-bottom: 1px solid #cccccc;
+      }
+      .software:last-of-type {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <h2>Open Source Licenses</h2>
+    </div>
+    <div id="explain">
+      <p>The following open source software is used by FreedomXMR.</p>
+      <p>FreedomXMR thanks each of these developers&mdash;This wouldn't be possible without them!</p>
+    </div>
+    <div class="software">
+      <h3>xmr-stak by fireice-uk and psychocrypt</h3>
+      <h4>
+        <a href="https://github.com/fireice-uk/xmr-stak" class="software-link">https://github.com/fireice-uk/xmr-stak</a>
+      </h4>
+      <h4>
+        License:
+        <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GNU GPL License V3</a>
+      </h4>
+    </div>
+    <div class="software">
+      <h3>electron-react-boilerplate by C. T. Lin</h3>
+      <h4>
+        <a href="https://github.com/chentsulin/electron-react-boilerplate" class="software-link">https://github.com/chentsulin/electron-react-boilerplate</a>
+      </h4>
+      <h4>
+        License:
+        <a href="https://opensource.org/licenses/MIT">MIT License</a>
+      </h4>
+    </div>
+    <script>
+      const { shell } = require('electron');
+      const links = document.querySelectorAll('.software-link');
+      links.forEach(link => {
+        link.addEventListener('click', event => {
+          event.preventDefault();
+          shell.openExternal(event.target.href);
+        });
+      });
+    </script>
+  </body>
+</html>
