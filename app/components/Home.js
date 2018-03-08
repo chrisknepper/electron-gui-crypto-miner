@@ -27,6 +27,9 @@ export default class Home extends Component {
     this.openWalletArticleLink = this.openWalletArticleLink.bind(this);
     this.openUpdateLink = this.openUpdateLink.bind(this);
     this.end = this.end.bind(this);
+    this.evaluateMiningEvent = this.evaluateMiningEvent.bind(this);
+    this.startCollectingHashrate = this.startCollectingHashrate.bind(this);
+    this.stopCollectingHashrate = this.stopCollectingHashrate.bind(this);
     this.mine = this.mine.bind(this);
     this.appendLog = this.appendLog.bind(this);
     this.handleWalletAddressChange = this.handleWalletAddressChange.bind(this);
@@ -41,6 +44,8 @@ export default class Home extends Component {
 
     this.state = {
       miningProcess: null,
+      miningProcessStatus: 0,
+      startedReadingHashrate: false,
       walletAddress: '',
       appOutOfDate: false,
       showLog: false,
@@ -125,56 +130,87 @@ export default class Home extends Component {
   }
 
   mine() {
-    console.log('mounted!', process.platform);
-    console.log('static', __dirname);
-    console.log('path to bundled program');
-    console.log('running at ', currentWindow.appInfo.path);
-    const miningProg = this.getMiningExecutable();
-    const miningProgConfig = this.getMiningConfig();
-    const cpuMiningConfig = this.getCpuMiningConfig();
-    // const externalProcess = child_process.spawn(miningProg, [
-    //   `--config`,
-    //   miningProgConfig
-    // ]);
-    const externalProcess = child_process.spawn(miningProg, [
-      '--config',
-      miningProgConfig,
-      '--cpu',
-      cpuMiningConfig,
-      `--url`,
-      '45.79.200.148:3333',
-      '--user',
-      this.state.walletAddress
-    ]);
-    externalProcess.on('message',  (data) => {
-      const dataStr = data.toString();
-      console.log('message from external program', dataStr);
-    });
-    externalProcess.stdout.on('data',  (data) => {
-      const dataStr = data.toString();
-      console.log('data from external program ', dataStr);
-      this.appendLog(dataStr);
-    });
-    externalProcess.stderr.on('data',  (data) => {
-      const dataStr = data.toString();
-      console.log('error from external program ', dataStr);
-    });
-    externalProcess.on('close',  (code) => {
-      console.log('external program closed ', code);
-      this.setState({miningProcess: null});
-    });
+    this.setState({
+      miningProcessStatus: 1
+    }, () => {
+      console.log('mounted!', process.platform);
+      console.log('static', __dirname);
+      console.log('path to bundled program');
+      console.log('running at ', currentWindow.appInfo.path);
+      const miningProg = this.getMiningExecutable();
+      const miningProgConfig = this.getMiningConfig();
+      const cpuMiningConfig = this.getCpuMiningConfig();
+      // const externalProcess = child_process.spawn(miningProg, [
+      //   `--config`,
+      //   miningProgConfig
+      // ]);
+      const externalProcess = child_process.spawn(miningProg, [
+        '--config',
+        miningProgConfig,
+        '--cpu',
+        cpuMiningConfig,
+        `--url`,
+        'freedomxmr.com:3333',
+        '--user',
+        this.state.walletAddress
+      ]);
+      externalProcess.on('message', (data) => {
+        const dataStr = data.toString();
+        console.log('message from external program', dataStr);
+      });
+      externalProcess.stdout.on('data', (data) => {
+        const dataStr = data.toString();
+        console.log('data from external program ', dataStr);
+        this.evaluateMiningEvent(dataStr);
+        this.appendLog(dataStr);
+      });
+      externalProcess.stderr.on('data', (data) => {
+        const dataStr = data.toString();
+        console.log('error from external program ', dataStr);
+      });
+      externalProcess.on('close', (code) => {
+        console.log('external program closed ', code);
+        this.setState({ miningProcess: null, miningProcessStatus: 0, startedReadingHashrate: false });
+      });
 
-    process.on('exit', () => this.end());
+      process.on('exit', () => this.end());
 
-    this.setState({miningProcess: externalProcess});
+      this.setState({ miningProcess: externalProcess });
+    });
   }
 
   end() {
     if (this.state.miningProcess) {
       console.warn('trying to kill mining process');
-      
       this.state.miningProcess.kill('SIGTERM');
+      this.stopCollectingHashrate();
     }
+  }
+
+  evaluateMiningEvent(line) {
+    if (line.includes('Start mining: MONERO') && this.state.miningProcessStatus === 1) {
+      this.setState({ miningProcessStatus: 2 });
+    } else if (line.includes('Pool logged in') && this.state.miningProcessStatus === 2) {
+      this.setState({ miningProcessStatus: 3 });
+    } else if (line.includes('Result accepted by the pool') && this.state.miningProcessStatus === 3 && !this.state.hashrateCollectionTimer) {
+      console.warn('ready to start showing and reading hashrate');
+      this.startCollectingHashrate();
+    }
+  }
+
+  startCollectingHashrate() {
+    const hashrateCollectionTimer = setInterval(() => {
+      if (this.state.miningProcess) {
+        console.warn('going to collect hashrate');
+        this.state.miningProcess.stdin.write('h\n');
+      }
+    }, 5000);
+    this.setState({hashrateCollectionTimer});
+  }
+
+  stopCollectingHashrate() {
+    clearInterval(this.state.hashrateCollectionTimer);
+    this.setState({hashrateCollectionTimer: null});
   }
 
   appendLog(line) {
@@ -236,22 +272,35 @@ export default class Home extends Component {
 
   getMiningStatusText() {
     if (this.state.miningProcess) {
+      if (this.state.miningProcessStatus === 1) {
+        return 'Initializing';
+      }
+      if (this.state.miningProcessStatus === 2) {
+        return 'Connecting';
+      }
       return 'Mining';
-    } else {
-      return 'Not mining';
     }
+    return 'Not mining';
   }
 
   maybeRenderStartMiningButton() {
-    if (!this.state.miningProcess) {
+    if (this.state.miningProcessStatus === 0) {
       return (
         <button className={styles.button} disabled={(!this.state.walletAddress.length)} onClick={this.mine}><i className="fa fa-play" /> Start Mining</button>
       );
     }
   }
 
+  maybeRenderStartingMiningButton() {
+    if (this.state.miningProcessStatus === 1 || this.state.miningProcessStatus === 2) {
+      return (
+        <button className={styles.button3} onClick={this.end}><i className="fa fa-stop" /> Mining Initializing</button>
+      );
+    }
+  }
+
   maybeRenderStopMiningButton() {
-    if (this.state.miningProcess) {
+    if (this.state.miningProcessStatus === 3) {
       return (
         <button className={styles.button2} onClick={this.end}><i className="fa fa-stop" /> Stop Mining</button>
       );
@@ -315,6 +364,7 @@ export default class Home extends Component {
             <h2>Wallet Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handleWalletAddressChange} value={this.state.walletAddress} placeholder={'Enter your wallet address here'} disabled={(this.state.miningProcess)} /></h2>
             <h2>System Status: {this.getMiningStatusText()}</h2>
             { this.maybeRenderStartMiningButton() }
+            {this.maybeRenderStartingMiningButton()}
             { this.maybeRenderStopMiningButton() }
             { /*<button className={styles.button} ><Link to="/counter">Start Mining</Link></button> */ }
             { this.renderConsoleLog() }

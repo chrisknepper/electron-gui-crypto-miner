@@ -21,6 +21,11 @@
   color: #ddd;
 }
 
+.container .button3 {
+  background: #ff6600;
+  color: #ddd;
+}
+
 .header {
   height: 50px;
   background: #ff6600;
