@@ -30,6 +30,7 @@ export default class Home extends Component {
     this.evaluateMiningEvent = this.evaluateMiningEvent.bind(this);
     this.startCollectingHashrate = this.startCollectingHashrate.bind(this);
     this.stopCollectingHashrate = this.stopCollectingHashrate.bind(this);
+    this.updateHashrate = this.updateHashrate.bind(this);
     this.mine = this.mine.bind(this);
     this.appendLog = this.appendLog.bind(this);
     this.handleWalletAddressChange = this.handleWalletAddressChange.bind(this);
@@ -46,6 +47,7 @@ export default class Home extends Component {
       miningProcess: null,
       miningProcessStatus: 0,
       startedReadingHashrate: false,
+      currentHashrate: 0,
       walletAddress: '',
       appOutOfDate: false,
       showLog: false,
@@ -196,26 +198,42 @@ export default class Home extends Component {
     } else if (line.includes('Pool logged in') && this.state.miningProcessStatus === 2) {
       this.setState({ miningProcessStatus: 3 });
     } else if (line.includes('Result accepted by the pool') && this.state.miningProcessStatus === 3 && !this.state.hashrateCollectionTimer) {
-      console.warn('ready to start showing and reading hashrate');
-      this.startCollectingHashrate();
+      //console.warn('ready to start showing and reading hashrate');
+      //this.startCollectingHashrate(line);
+    } else if (line.includes('HASHRATE REPORT')) {
+      this.updateHashrate(line);
     }
   }
 
   startCollectingHashrate() {
     // const hashrateCollectionTimer = setInterval(() => {
-    //  if (this.state.miningProcess) {
-        // console.warn('going to collect hashrate');
-        // this.state.miningProcess.stdin.write('"h"\r\n');
-        // Right now we're using xmr-stak's automatic hashrate reporting...
-        // writing to stdin doesn't work in Windows for some ridiculous reason >:(
-      }
+    //   if (this.state.miningProcess) {
+    //     // console.warn('going to collect hashrate');
+    //     // this.state.miningProcess.stdin.write('"h"\r\n');
+    //     // Right now we're using xmr-stak's automatic hashrate reporting...
+    //     // writing to stdin doesn't work in Windows for some ridiculous reason >:(
+    //   }
     // }, 5000);
     // this.setState({hashrateCollectionTimer});
   }
 
   stopCollectingHashrate() {
     // clearInterval(this.state.hashrateCollectionTimer);
-    // this.setState({hashrateCollectionTimer: null});
+    this.setState({hashrateCollectionTimer: null, currentHashrate: 0});
+  }
+
+  updateHashrate(line) {
+    // console.warn('calling updateHashrate');
+    const lineWithTotal = line.split('\n').filter((line) => line.includes('Totals:'))[0];
+    // console.warn('lineWithTotal', lineWithTotal);
+    const trimmedLine = lineWithTotal.replace(/Totals:|\(na\)/g, '').trim().split(' ').filter(str => str.length);
+    // console.warn('trimmedLine', trimmedLine);
+    if (!Number.isNaN(Number(trimmedLine[0]))) {
+      // console.warn('we got a number hashrate', trimmedLine[0]);
+      const average10SecondHashrateString = `${trimmedLine[0]} ${trimmedLine[trimmedLine.length - 1]}`;
+      this.setState({currentHashrate: average10SecondHashrateString});
+    }
+
   }
 
   appendLog(line) {
@@ -286,6 +304,20 @@ export default class Home extends Component {
       return 'Mining';
     }
     return 'Not mining';
+  }
+
+  maybeRenderHashrate() {
+      let hashrateToDisplay;
+      if (this.state.miningProcessStatus !== 3) {
+        hashrateToDisplay = '0 H/s';
+      } else if (this.state.currentHashrate === 0) {
+        hashrateToDisplay = 'Determining...';
+      } else {
+        hashrateToDisplay = this.state.currentHashrate;
+      }
+      return (
+        <h3>Current Hashrate: {hashrateToDisplay}</h3>
+      );
   }
 
   maybeRenderStartMiningButton() {
@@ -368,6 +400,7 @@ export default class Home extends Component {
           <div className={styles.body}>
             <h2>Wallet Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handleWalletAddressChange} value={this.state.walletAddress} placeholder={'Enter your wallet address here'} disabled={(this.state.miningProcess)} /></h2>
             <h2>System Status: {this.getMiningStatusText()}</h2>
+            { this.maybeRenderHashrate() }
             { this.maybeRenderStartMiningButton() }
             {this.maybeRenderStartingMiningButton()}
             { this.maybeRenderStopMiningButton() }
