@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>About FreedomXMR</title>
+    <style>
+      body {
+        color: WindowText;
+        background-color: Window;
+        font: caption;
+      }
+      #header {
+        text-align: center;
+        margin-top: 40px;
+      }
+      #explain {
+        border-bottom: 1px solid #cccccc;
+      }
+      .software {
+        border-bottom: 1px solid #cccccc;
+      }
+      .software:last-of-type {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <h2>About FreedomXMR</h2>
+    </div>
+    <div id="explain">
+      <p>Graphical Monero miner, built on xmr-stak.</p>
+      <p>Connects to <a href="http://freedomxmr.com" class="software-link">FreedomXMR Pool</a> by default.</p>
+    </div>
+    <div class="software">
+      <h4>
+        <a href="https://github.com/chrisknepper/electron-gui-crypto-miner" class="software-link">https://github.com/chrisknepper/electron-gui-crypto-miner</a>
+      </h4>
+      <h4>
+        License:
+        <a href="https://opensource.org/licenses/MIT">MIT License</a>
+      </h4>
+    </div>
+    <script>
+      const { shell } = require('electron');
+      const links = document.querySelectorAll('.software-link');
+      links.forEach(link => {
+        link.addEventListener('click', event => {
+          event.preventDefault();
+          shell.openExternal(event.target.href);
+        });
+      });
+    </script>
+  </body>
+</html>

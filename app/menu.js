@@ -9,6 +9,7 @@ export default class MenuBuilder {
   constructor(mainWindow: BrowserWindow, rootExtraDir: string) {
     this.mainWindow = mainWindow;
     this.licenseWindow = null;
+    this.aboutWindow = null;
     this.rootExtraDir = rootExtraDir;
   }
 
@@ -51,7 +52,7 @@ export default class MenuBuilder {
     const subMenuAbout = {
       label: 'Freedom XMR Miner',
       submenu: [
-        { label: 'About Freedom XMR Miner', selector: 'orderFrontStandardAboutPanel:' },
+        { label: 'About FreedomXMR', click: () => { this.openAboutWindow(); } },
         { type: 'separator' },
         { label: 'Services', submenu: [] },
         { type: 'separator' },
@@ -100,7 +101,7 @@ export default class MenuBuilder {
     const subMenuHelp = {
       label: 'Help',
       submenu: [
-        { label: 'Learn More', click() { shell.openExternal('https://api.github.com/repos/chrisknepper/electron-gui-crypto-miner'); } },
+        { label: 'Learn More', click() { shell.openExternal('https://github.com/chrisknepper/electron-gui-crypto-miner'); } },
         { label: 'Open Dev Tools (plz no bully)', click: () => { this.mainWindow.toggleDevTools(); } },
         { label: 'Open Source Licenses', click: () => { this.openLicenseWindow(); } }
       ]
@@ -162,9 +163,10 @@ export default class MenuBuilder {
     }, {
       label: 'Help',
       submenu: [
-        { label: 'Learn More', click() { shell.openExternal('https://api.github.com/repos/chrisknepper/electron-gui-crypto-miner'); } },
+        { label: 'Learn More', click() { shell.openExternal('https://github.com/chrisknepper/electron-gui-crypto-miner'); } },
         { label: 'Open Dev Tools (plz no bully)', click: () => { this.mainWindow.toggleDevTools(); } },
-        { label: 'Open Source Licenses', click: () => { this.openLicenseWindow(); } }
+        { label: 'Open Source Licenses', click: () => { this.openLicenseWindow(); } },
+        { label: 'About FreedomXMR', click: () => { this.openAboutWindow(); } }
       ]
     }];
 
@@ -188,10 +190,38 @@ export default class MenuBuilder {
       titleBarStyle: 'hiddenInset'
     });
 
+    this.licenseWindow.setMenu(null);
+
     this.licenseWindow.loadURL('file://' + this.rootExtraDir + '/OpenSourceLicenses.html');
 
     this.licenseWindow.on('closed', () => {
       this.licenseWindow = null;
+    });
+  }
+
+  openAboutWindow() {
+    if (this.aboutWindow) {
+      this.aboutWindow.focus();
+      return;
+    }
+
+    this.aboutWindow = new BrowserWindow({
+      height: 450,
+      resizable: false,
+      width: 360,
+      title: 'About',
+      minimizable: false,
+      maximizable: false,
+      fullscreenable: false,
+      titleBarStyle: 'hiddenInset'
+    });
+
+    this.aboutWindow.setMenu(null);
+
+    this.aboutWindow.loadURL('file://' + this.rootExtraDir + '/About.html');
+
+    this.aboutWindow.on('closed', () => {
+      this.aboutWindow = null;
     });
   }
 }
