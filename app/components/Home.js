@@ -202,19 +202,20 @@ export default class Home extends Component {
   }
 
   startCollectingHashrate() {
-    const hashrateCollectionTimer = setInterval(() => {
-      if (this.state.miningProcess) {
-        console.warn('going to collect hashrate');
-        this.state.miningProcess.stdin.write('h\r\n');
-        this.state.miningProcess.stdout.write('h\r\n');
+    // const hashrateCollectionTimer = setInterval(() => {
+    //  if (this.state.miningProcess) {
+        // console.warn('going to collect hashrate');
+        // this.state.miningProcess.stdin.write('"h"\r\n');
+        // Right now we're using xmr-stak's automatic hashrate reporting...
+        // writing to stdin doesn't work in Windows for some ridiculous reason >:(
       }
-    }, 5000);
-    this.setState({hashrateCollectionTimer});
+    // }, 5000);
+    // this.setState({hashrateCollectionTimer});
   }
 
   stopCollectingHashrate() {
-    clearInterval(this.state.hashrateCollectionTimer);
-    this.setState({hashrateCollectionTimer: null});
+    // clearInterval(this.state.hashrateCollectionTimer);
+    // this.setState({hashrateCollectionTimer: null});
   }
 
   appendLog(line) {
