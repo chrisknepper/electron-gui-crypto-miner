@@ -43,7 +43,8 @@
     ],
     "extraResources": [
       "app/bin/**",
-      "app/assets/**"
+      "app/assets/**",
+      "app/extra/**"
     ],
     "dmg": {
       "contents": [
