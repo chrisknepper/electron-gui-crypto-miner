@@ -72,6 +72,7 @@ app.on('ready', async () => {
   const resourcesPath = process.resourcesPath;
   const rootBinDir = (isProduction ? path.resolve(process.resourcesPath, 'app', 'bin') : path.resolve(__dirname, 'bin'));
   const rootAssetDir = (isProduction ? path.resolve(process.resourcesPath, 'app', 'assets') : path.resolve(__dirname, 'assets'));
+  const rootExtraDir = (isProduction ? path.resolve(process.resourcesPath, 'app', 'extra') : path.resolve(__dirname, 'extra'));
 
   mainWindow.appInfo = {
     path: app.getAppPath(),
@@ -98,6 +99,6 @@ app.on('ready', async () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
+  const menuBuilder = new MenuBuilder(mainWindow, rootExtraDir);
   menuBuilder.buildMenu();
 });

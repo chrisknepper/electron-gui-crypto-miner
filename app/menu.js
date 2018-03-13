@@ -4,13 +4,15 @@ import { app, Menu, shell, BrowserWindow } from 'electron';
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
   licenseWindow: BrowserWindow;
+  rootExtraDir: String;
 
-  constructor(mainWindow: BrowserWindow) {
+  constructor(mainWindow: BrowserWindow, rootExtraDir: string) {
     this.mainWindow = mainWindow;
     this.licenseWindow = null;
+    this.rootExtraDir = rootExtraDir;
   }
 
-  buildMenu() {
+  buildMenu(rootExtraDir) {
     if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
       this.setupDevelopmentEnvironment();
     }
@@ -186,7 +188,7 @@ export default class MenuBuilder {
       titleBarStyle: 'hiddenInset'
     });
 
-    this.licenseWindow.loadURL('file://' + __dirname + '/extra/OpenSourceLicenses.html');
+    this.licenseWindow.loadURL('file://' + this.rootExtraDir + '/OpenSourceLicenses.html');
 
     this.licenseWindow.on('closed', () => {
       this.licenseWindow = null;
