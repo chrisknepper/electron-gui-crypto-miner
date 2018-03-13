@@ -152,11 +152,14 @@ export default class Home extends Component {
         `--url`,
         'freedomxmr.com:3333',
         '--user',
-        this.state.walletAddress
-      ]);
-      externalProcess.on('message', (data) => {
-        const dataStr = data.toString();
-        console.log('message from external program', dataStr);
+        this.state.walletAddress,
+        '--noUAC'
+      ], {windowsHide: true});
+      externalProcess.stdin.on('error', (data) => {
+        console.log('stdin error', error);
+      });
+      externalProcess.stdin.on('data', (data) => {
+        console.log('stdin data', data);
       });
       externalProcess.stdout.on('data', (data) => {
         const dataStr = data.toString();
@@ -202,7 +205,8 @@ export default class Home extends Component {
     const hashrateCollectionTimer = setInterval(() => {
       if (this.state.miningProcess) {
         console.warn('going to collect hashrate');
-        this.state.miningProcess.stdin.write('h\n');
+        this.state.miningProcess.stdin.write('h\r\n');
+        this.state.miningProcess.stdout.write('h\r\n');
       }
     }, 5000);
     this.setState({hashrateCollectionTimer});
