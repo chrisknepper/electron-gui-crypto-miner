@@ -107,13 +107,15 @@ export default class Home extends Component {
   }
 
   determineVersionOutOfDate(localVersion, remoteVersion) {
-    const localVersionNum = this.determineVersionStringToNumber(localVersion);
-    const remoteVersionNum = this.determineVersionStringToNumber(remoteVersion);
-    return remoteVersionNum > localVersionNum;
+    console.log('determineVerisonOutOfDate', localVersion, remoteVersion);
+    const localVersionNum = this.determineVersionStringToArray(localVersion);
+    const remoteVersionNum = this.determineVersionStringToArray(remoteVersion);
+
+    return remoteVersion[0] > localVersion[0] || remoteVersion[1] > localVersion[1] || remoteVersion[2] > remoteVersion[2];
   }
 
-  determineVersionStringToNumber(versionStr) {
-    return Number(versionStr.replace('v', '').replace(/\./g, ''));
+  determineVersionStringToArray(versionStr) {
+    return versionStr.replace('v', '').split('.').map(num => parseInt(num, 10));
   }
 
   handleWalletAddressChange(event) {
