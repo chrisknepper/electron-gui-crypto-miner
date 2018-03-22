@@ -112,12 +112,11 @@ export default class Home extends Component {
     }
   }
 
-  determineVersionOutOfDate(localVersion, remoteVersion) {
-    console.log('determineVerisonOutOfDate', localVersion, remoteVersion);
-    const localVersionNum = this.determineVersionStringToArray(localVersion);
-    const remoteVersionNum = this.determineVersionStringToArray(remoteVersion);
-
-    return remoteVersion[0] > localVersion[0] || remoteVersion[1] > localVersion[1] || remoteVersion[2] > remoteVersion[2];
+  determineVersionOutOfDate(localVersionStr, remoteVersionStr) {
+    console.log('determineVerisonOutOfDate', localVersionStr, remoteVersionStr);
+    const localVersionArr = this.determineVersionStringToArray(localVersionStr);
+    const remoteVersionArr = this.determineVersionStringToArray(remoteVersionStr);
+    return (remoteVersionArr[0] > localVersionArr[0]) || (remoteVersionArr[1] > localVersionArr[1]) || (remoteVersionArr[2] > remoteVersionArr[2]);
   }
 
   determineVersionStringToArray(versionStr) {
@@ -166,23 +165,23 @@ export default class Home extends Component {
         '--noUAC'
       ], {windowsHide: true});
       externalProcess.stdin.on('error', (data) => {
-        console.log('stdin error', error);
+        //console.log('stdin error', error);
       });
       externalProcess.stdin.on('data', (data) => {
-        console.log('stdin data', data);
+        //console.log('stdin data', data);
       });
       externalProcess.stdout.on('data', (data) => {
         const dataStr = data.toString();
-        console.log('data from external program ', dataStr);
+        //console.log('data from external program ', dataStr);
         this.evaluateMiningEvent(dataStr);
         this.appendLog(dataStr);
       });
       externalProcess.stderr.on('data', (data) => {
         const dataStr = data.toString();
-        console.log('error from external program ', dataStr);
+        //console.log('error from external program ', dataStr);
       });
       externalProcess.on('close', (code) => {
-        console.log('external program closed ', code);
+        //console.log('external program closed ', code);
         this.setState({ miningProcess: null, miningProcessStatus: 0, startedReadingHashrate: false });
       });
 
