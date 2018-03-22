@@ -1,7 +1,7 @@
 {
   "name": "electron-gui-crypto-miner",
   "productName": "Freedom XMR",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Cross-platform GUI application to easily mine cryptocurrency as part a pool. Based on Electron, React, React Router, Webpack, React Hot Loader for rapid application development",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
