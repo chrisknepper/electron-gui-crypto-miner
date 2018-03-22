@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Store from 'electron-store';
 import styles from './Home.css';
 
 const child_process = require('child_process');
@@ -11,6 +12,7 @@ const LOCAL_APP_VERSION = currentWindow.appInfo.version;
 const ASSET_PATH = currentWindow.appInfo.rootAssetDir;
 
 const { shell } = require('electron');
+const store = new Store();
 
 const IS_MAC = (process.platform === 'darwin');
 const IS_WINDOWS = (process.platform === 'win32');
@@ -57,9 +59,13 @@ export default class Home extends Component {
 
   async componentDidMount() {
 
-    const storedWalletAddress = localStorage.getItem('walletAddress');
+    const storedWalletAddress = store.get('walletAddress');
     if (storedWalletAddress) {
       this.setState({ walletAddress: storedWalletAddress });
+    }
+    const showLog = store.get('showLog');
+    if (showLog) {
+      this.setState({ showLog });
     }
 
     const latestLocalVersion = LOCAL_APP_VERSION;
@@ -121,7 +127,7 @@ export default class Home extends Component {
   handleWalletAddressChange(event) {
     const newValue = event.target.value;
     this.setState({walletAddress: newValue}, () => {
-      localStorage.setItem('walletAddress', newValue);
+      store.set('walletAddress', newValue);
     });
   }
 
@@ -366,7 +372,7 @@ export default class Home extends Component {
             name="showLog"
             type="checkbox"
             checked={this.state.showLog}
-            onChange={(event) => {console.log('checked?', event.target.checked); this.setState({showLog: event.target.checked})}} /> Display Logs
+            onChange={(event) => {console.log('checked?', event.target.checked); store.set('showLog', event.target.checked); this.setState({showLog: event.target.checked})}} /> Display Logs
         </label>
       </div>
     
