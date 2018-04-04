@@ -87,10 +87,15 @@
   font-size: 1.2rem;
 }
 
-.showLogCheckbox {
+.advancedSettingsContainer {
   position: absolute;
-  bottom: 30px;
+  bottom: 15px;
   right: 15px;
+  text-align: right;
+}
+
+.advancedSettingsCheckbox {
+  display: block;
 }
 
 .logContainer {

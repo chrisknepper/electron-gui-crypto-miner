@@ -14,6 +14,8 @@ const ASSET_PATH = currentWindow.appInfo.rootAssetDir;
 const { shell } = require('electron');
 const store = new Store();
 
+const DEFAULT_POOL_ADDRESS = 'freedomxmr.com:3333';
+
 const IS_MAC = (process.platform === 'darwin');
 const IS_WINDOWS = (process.platform === 'win32');
 
@@ -35,6 +37,7 @@ export default class Home extends Component {
     this.updateHashrate = this.updateHashrate.bind(this);
     this.mine = this.mine.bind(this);
     this.appendLog = this.appendLog.bind(this);
+    this.handlePoolAddressChange = this.handlePoolAddressChange.bind(this);
     this.handleWalletAddressChange = this.handleWalletAddressChange.bind(this);
     this.getMiningExecutable = this.getMiningExecutable.bind(this);
     this.getMiningConfig = this.getMiningConfig.bind(this);
@@ -51,7 +54,9 @@ export default class Home extends Component {
       startedReadingHashrate: false,
       currentHashrate: 0,
       walletAddress: '',
+      poolAddress: '',
       appOutOfDate: false,
+      showPoolAddress: false,
       showLog: false,
       logArray: []
     }
@@ -63,9 +68,22 @@ export default class Home extends Component {
     if (storedWalletAddress) {
       this.setState({ walletAddress: storedWalletAddress });
     }
+
+    const storedPoolAddress = store.get('poolAddress');
+    if (storedPoolAddress) {
+      this.setState({ poolAddress: storedPoolAddress });
+    } else {
+      this.setState({ poolAddress: DEFAULT_POOL_ADDRESS });
+    }
+
     const showLog = store.get('showLog');
     if (showLog) {
       this.setState({ showLog });
+    }
+
+    const showPoolAddress = store.get('showPoolAddress');
+    if (showPoolAddress) {
+      this.setState({ showPoolAddress });
     }
 
     const latestLocalVersion = LOCAL_APP_VERSION;
@@ -79,7 +97,7 @@ export default class Home extends Component {
         this.setState({appOutOfDate: true});
       }
     }
-    
+
   }
 
   componentWillUnmount() {
@@ -123,6 +141,13 @@ export default class Home extends Component {
     return versionStr.replace('v', '').split('.').map(num => parseInt(num, 10));
   }
 
+  handlePoolAddressChange(event) {
+    const newValue = event.target.value;
+    this.setState({ poolAddress: newValue }, () => {
+      store.set('poolAddress', newValue);
+    });
+  }
+
   handleWalletAddressChange(event) {
     const newValue = event.target.value;
     this.setState({walletAddress: newValue}, () => {
@@ -159,7 +184,7 @@ export default class Home extends Component {
         '--cpu',
         cpuMiningConfig,
         `--url`,
-        'freedomxmr.com:3333',
+        this.state.poolAddress,
         '--user',
         this.state.walletAddress,
         '--noUAC'
@@ -363,10 +388,17 @@ export default class Home extends Component {
     }
   }
 
-  renderConsoleLogCheckbox() {
+  renderAdvancedSettingsCheckboxes() {
     return (
-      <div className={styles.showLogCheckbox}>
-        <label>
+      <div className={styles.advancedSettingsContainer}>
+        <label className={styles.advancedSettingsCheckbox}>
+          <input
+            name="showPoolAddress"
+            type="checkbox"
+            checked={this.state.showPoolAddress}
+            onChange={(event) => { console.log('checked?', event.target.checked); store.set('showPoolAddress', event.target.checked); this.setState({ showPoolAddress: event.target.checked }) }} /> Display Pool Address
+        </label>
+        <label className={styles.advancedSettingsCheckbox}>
           <input
             name="showLog"
             type="checkbox"
@@ -376,6 +408,14 @@ export default class Home extends Component {
       </div>
     
     );
+  }
+
+  maybeRenderPoolAddress() {
+    if (this.state.showPoolAddress) {
+      return (
+        <h2>Pool Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handlePoolAddressChange} value={this.state.poolAddress} placeholder={'Enter the pool address here'} disabled={(this.state.miningProcess)} /></h2>
+      );
+    }
   }
 
   renderConsoleLog() {
@@ -406,6 +446,7 @@ export default class Home extends Component {
           </div>
           <div className={styles.body}>
             <h2>Wallet Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handleWalletAddressChange} value={this.state.walletAddress} placeholder={'Enter your wallet address here'} disabled={(this.state.miningProcess)} /></h2>
+            { this.maybeRenderPoolAddress() }
             <h2>System Status: {this.getMiningStatusText()}</h2>
             { this.maybeRenderHashrate() }
             { this.maybeRenderStartMiningButton() }
@@ -416,7 +457,7 @@ export default class Home extends Component {
             <div>
               { this.renderAppVersion() }
               { this.renderOutOfDateNotification() }
-              { this.renderConsoleLogCheckbox() }
+              { this.renderAdvancedSettingsCheckboxes() }
             </div>
           </div>
         </div>
