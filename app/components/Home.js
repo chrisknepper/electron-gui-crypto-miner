@@ -14,6 +14,8 @@ const ASSET_PATH = currentWindow.appInfo.rootAssetDir;
 const { shell } = require('electron');
 const store = new Store();
 
+const NOTIFICATION_DISPLAY_TIME = 7500;
+
 const DEFAULT_POOL_ADDRESS = 'freedomxmr.com:3333';
 
 const IS_MAC = (process.platform === 'darwin');
@@ -38,6 +40,7 @@ export default class Home extends Component {
     this.mine = this.mine.bind(this);
     this.appendLog = this.appendLog.bind(this);
     this.handlePoolAddressChange = this.handlePoolAddressChange.bind(this);
+    this.handlePoolPasswordChange = this.handlePoolPasswordChange.bind(this);
     this.handleWalletAddressChange = this.handleWalletAddressChange.bind(this);
     this.getMiningExecutable = this.getMiningExecutable.bind(this);
     this.getMiningConfig = this.getMiningConfig.bind(this);
@@ -55,6 +58,8 @@ export default class Home extends Component {
       currentHashrate: 0,
       walletAddress: '',
       poolAddress: '',
+      poolPassword: '',
+      notification: null,
       appOutOfDate: false,
       showPoolAddress: false,
       showLog: false,
@@ -74,6 +79,11 @@ export default class Home extends Component {
       this.setState({ poolAddress: storedPoolAddress });
     } else {
       this.setState({ poolAddress: DEFAULT_POOL_ADDRESS });
+    }
+
+    const storedPoolPassword = store.get('poolPassword');
+    if (storedPoolPassword) {
+      this.setState({ poolPassword: storedPoolPassword });
     }
 
     const showLog = store.get('showLog');
@@ -102,6 +112,20 @@ export default class Home extends Component {
 
   componentWillUnmount() {
     this.end();
+  }
+
+  pushNotification(notification) {
+    this.setState({notification}, () => {
+      setTimeout(() => {
+        this.closeNotification();
+      }, NOTIFICATION_DISPLAY_TIME);
+    });
+  }
+
+  closeNotification() {
+    this.setState({
+      notification: null
+    });
   }
 
   async getLatestVersionOfApp() {
@@ -148,6 +172,13 @@ export default class Home extends Component {
     });
   }
 
+  handlePoolPasswordChange(event) {
+    const newValue = event.target.value;
+    this.setState({ poolPassword: newValue }, () => {
+      store.set('poolPassword', newValue);
+    });
+  }
+
   handleWalletAddressChange(event) {
     const newValue = event.target.value;
     this.setState({walletAddress: newValue}, () => {
@@ -187,6 +218,8 @@ export default class Home extends Component {
         this.state.poolAddress,
         '--user',
         this.state.walletAddress,
+        '--pass',
+        this.state.poolPassword,
         '--noUAC'
       ], {windowsHide: true});
       externalProcess.stdin.on('error', (data) => {
@@ -229,6 +262,9 @@ export default class Home extends Component {
       this.setState({ miningProcessStatus: 2 });
     } else if (line.includes('Pool logged in') && this.state.miningProcessStatus === 2) {
       this.setState({ miningProcessStatus: 3 });
+    } else if (line.includes('No login/password specified') && this.state.miningProcessStatus === 2) {
+      this.end();
+      this.pushNotification(`This pool (${this.state.poolAddress}) requires a password to mine. Enter one and try again.`);
     } else if (line.includes('Result accepted by the pool') && this.state.miningProcessStatus === 3 && !this.state.hashrateCollectionTimer) {
       //console.warn('ready to start showing and reading hashrate');
       //this.startCollectingHashrate(line);
@@ -388,6 +424,12 @@ export default class Home extends Component {
     }
   }
 
+  renderGeneralNotification() {
+    if (this.state.notification) {
+      return <h5 className={styles.versionOutOfDate}><a href="#" onClick={this.closeNotification}>{this.state.notification}</a></h5>
+    }
+  }
+
   renderAdvancedSettingsCheckboxes() {
     return (
       <div className={styles.advancedSettingsContainer}>
@@ -396,7 +438,7 @@ export default class Home extends Component {
             name="showPoolAddress"
             type="checkbox"
             checked={this.state.showPoolAddress}
-            onChange={(event) => { console.log('checked?', event.target.checked); store.set('showPoolAddress', event.target.checked); this.setState({ showPoolAddress: event.target.checked }) }} /> Display Pool Address
+            onChange={(event) => { console.log('checked?', event.target.checked); store.set('showPoolAddress', event.target.checked); this.setState({ showPoolAddress: event.target.checked }) }} /> Display Pool Settings
         </label>
         <label className={styles.advancedSettingsCheckbox}>
           <input
@@ -413,7 +455,10 @@ export default class Home extends Component {
   maybeRenderPoolAddress() {
     if (this.state.showPoolAddress) {
       return (
-        <h2>Pool Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handlePoolAddressChange} value={this.state.poolAddress} placeholder={'Enter the pool address here'} disabled={(this.state.miningProcess)} /></h2>
+        <div>
+          <h2>Pool Address: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handlePoolAddressChange} value={this.state.poolAddress} placeholder={'Enter the pool address here'} disabled={(this.state.miningProcess)} /></h2>
+          <h2>Pool Password: <input type="text" size="40" className={styles.walletAddressInput} onChange={this.handlePoolPasswordChange} value={this.state.poolPassword} placeholder={'Enter the pool password (if applicable)'} disabled={(this.state.miningProcess)} /></h2>
+        </div>
       );
     }
   }
@@ -422,8 +467,8 @@ export default class Home extends Component {
     if (this.state.showLog) {
       return (
         <div className={styles.logContainer}>
-          { this.state.logArray.map((log) => {
-              return <span className={styles.log}>{log}</span>
+          { this.state.logArray.map((log, index) => {
+              return <span key={`console_log_${index}`} className={styles.log}>{log}</span>
             })
           }
         </div>
@@ -457,6 +502,7 @@ export default class Home extends Component {
             <div>
               { this.renderAppVersion() }
               { this.renderOutOfDateNotification() }
+              { this.renderGeneralNotification() }
               { this.renderAdvancedSettingsCheckboxes() }
             </div>
           </div>
